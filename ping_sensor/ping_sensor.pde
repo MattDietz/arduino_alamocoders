@@ -1,4 +1,5 @@
 import processing.opengl.*;
+import processing.serial.*;
 
 String DRAWMODE = OPENGL;
 int screenWidth = 640, screenHeight = 480;
@@ -8,22 +9,37 @@ ArrayList balls;
 int delay = 0, maxDelay = 10; // Add a new ball every 10 frames
 float decay = 5; // percent
 
+String fifoPath = "test_fifo";
+RandFifo reader; 
+
 void setup() {
   frameRate(30);
   balls = new ArrayList();
   noStroke();
   size(screenWidth, screenHeight, DRAWMODE); 
   colorMode(RGB);
+  
+  reader = new RandFifo(fifoPath);    
 }
 
-void addBall() {
-  float red = random(255), green = random(255), blue = random(255), alpha = random(255);
+void addBall(float magnitude) {
+  float red = random(255), green = random(255), blue = random(255);
   
-  float radius = random(200);
+  float radius = magnitude;
   float x = random(screenWidth - radius*2) + radius;
   float y = random(screenHeight - radius*2) + radius;
   int ballLife = int(random(120))+120;  
+  // Ball(float x, float y, float radius, float r, float g, float b, int ballLife)
   balls.add(new Ball(x, y, radius, red, green, blue, ballLife));
+}
+
+//Returns magnitude
+float readInput() {
+  int input = -1;
+
+  input = reader.read();
+  
+  return float(input);
 }
 
 void drawBalls() {
@@ -35,9 +51,8 @@ void drawBalls() {
       continue;
     }
     float fade = (float(b.ballLife) / float(b.maxBallLife))*255.0 + 1;
-    println(b.ballLife+" "+fade);
     fill(b.r, b.g, b.b, fade);
-    ellipse(b.x, b.y, b.r, b.r); 
+    ellipse(b.x, b.y, b.radius, b.radius); 
   } 
 }
 
@@ -47,7 +62,9 @@ void draw() {
   delay++;
   
   if (delay == maxDelay) {
-    addBall();
+    float input = readInput();
+    if (input > -1)
+      addBall(input);
     delay = 0;
   }
   drawBalls();
