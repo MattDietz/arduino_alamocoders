@@ -1,11 +1,19 @@
+/*
+  A really absurd class. First attempts to list and utilize the serial port requested.
+  
+  If that's not found, looks for a file on disk denoted by fifoPath. Hopefully you either made a 
+  fake serial port or used mkfifo.
+  
+  Failing both of those, just generate a random int and throw it back
+*/
 class SmartFifo {
   Serial serialPort;
   InputStream fifo;
   
-  SmartFifo(PApplet parent, String serialName, String path) {
+  SmartFifo(PApplet parent, String serialName, String fifoPath) {
     serialPort = setupSerial(parent, serialName);
     if (serialPort == null)
-      fifo = createInput(path); 
+      fifo = createInput(fifoPath); 
   }
   
   Serial setupSerial(PApplet parent, String serialName) {
@@ -32,6 +40,6 @@ class SmartFifo {
       }
     }
     else
-      return int(random(99)+1);
+      return int(random(254)+1);
   } 
 }

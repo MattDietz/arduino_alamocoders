@@ -1,3 +1,4 @@
+// This is why other languages give you Structs
 class Ball {
   float x, y, r, g, b, radius; 
   int ballLife, maxBallLife;
