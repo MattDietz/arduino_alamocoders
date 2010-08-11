@@ -30,7 +30,8 @@ class SmartFifo {
     if (serialPort != null) {
       int val = serialPort.read();
       println(val);
-      return val;
+      if(val == -1) return val;
+      return 254-val;
     }
     if (fifo != null) {
       try { 
